@@ -1,0 +1,12 @@
+{{template "base.html" .}}
+
+{{define "title"}}오류{{end}}
+
+{{define "content"}}
+<div class="alert alert-error">
+    <h2>오류가 발생했습니다</h2>
+    <p>{{.Error}}</p>
+</div>
+<a href="/" class="btn">홈으로 돌아가기</a>
+{{end}}
+

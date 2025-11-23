@@ -1,0 +1,71 @@
+{{template "base.html" .}}
+
+{{define "title"}}관리자 대시보드{{end}}
+
+{{define "styles"}}{{template "admin_styles" .}}{{end}}
+
+{{define "content"}}
+<h2>관리자 대시보드</h2>
+<p class="admin-intro">강좌를 등록하고 관리하세요.</p>
+
+<div id="adminFeedback" class="alert feedback"></div>
+
+<div class="admin-container">
+    <section class="admin-card">
+        <h3>강좌 등록</h3>
+        <form id="createLectureForm" class="form-grid">
+            <div>
+                <label for="lectureId">강좌 번호 *</label>
+                <input type="number" id="lectureId" min="1" required placeholder="1234">
+            </div>
+            <div>
+                <label for="lectureName">강좌명 *</label>
+                <input type="text" id="lectureName" required placeholder="고급 알고리즘">
+            </div>
+            <div>
+                <label for="lectureCapacity">정원 *</label>
+                <input type="number" id="lectureCapacity" min="1" max="30" required placeholder="30">
+            </div>
+            <div>
+                <label for="lectureCredit">학점 *</label>
+                <input type="number" id="lectureCredit" min="1" max="6" required placeholder="3">
+            </div>
+            <div>
+                <label for="lectureDay">요일 *</label>
+                <select id="lectureDay" required>
+                    <option value="">선택</option>
+                    <option value="MON">월요일</option>
+                    <option value="TUE">화요일</option>
+                    <option value="WED">수요일</option>
+                    <option value="THU">목요일</option>
+                    <option value="FRI">금요일</option>
+                </select>
+            </div>
+            <div class="field-row">
+                <div>
+                    <label for="lectureStart">시작 시간 *</label>
+                    <input type="time" id="lectureStart" required>
+                </div>
+                <div>
+                    <label for="lectureEnd">종료 시간 *</label>
+                    <input type="time" id="lectureEnd" required>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-success">강좌 등록</button>
+        </form>
+    </section>
+
+    <section class="admin-card">
+        <div class="lecture-list-header">
+            <h3>등록된 강좌</h3>
+            <button id="refreshLecturesBtn" class="btn btn-secondary">새로고침</button>
+        </div>
+        <div id="lectureListContainer">
+            <p class="loading-text">로딩 중...</p>
+        </div>
+    </section>
+</div>
+{{end}}
+
+{{define "scripts"}}{{template "admin_scripts" .}}{{end}}
+

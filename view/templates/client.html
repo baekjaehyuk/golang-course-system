@@ -1,0 +1,72 @@
+{{template "base.html" .}}
+
+{{define "title"}}수강생 대시보드{{end}}
+
+{{define "styles"}}{{template "client_styles" .}}{{end}}
+
+{{define "content"}}
+<div id="clientDashboard" data-student-id="{{.StudentID}}">
+    <h2>수강생 대시보드</h2>
+    <p class="dashboard-intro">접속한 학번 : <span class="badge" id="currentStudentId">{{if .StudentID}}{{.StudentID}}{{else}}미지정{{end}}</span></p>
+
+    <div id="clientFeedback" class="alert feedback"></div>
+
+    <section class="card">
+        <div class="controls" style="justify-content: space-between;">
+            <div>
+                <h3 style="margin:0;">강좌 목록</h3>
+                <p class="muted" style="margin:0;">각 강좌 옆의 "수강신청" 버튼을 클릭하여 신청하세요.</p>
+            </div>
+            <div style="display:flex; gap:0.5rem; align-items:flex-start;">
+                <button id="fetchLecturesBtn" class="btn">새로고침</button>
+            </div>
+        </div>
+        <div id="lectureEmptyNotice" class="muted hidden">등록된 강좌가 없습니다.</div>
+        <div class="table-container">
+            <table id="lectureTable" class="data-table">
+                <thead>
+                    <tr>
+                        <th>강좌 ID</th>
+                        <th>강좌명</th>
+                        <th>학점</th>
+                        <th>수강 인원</th>
+                        <th>정원</th>
+                        <th>요일</th>
+                        <th>시간</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="lectureTableBody"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="card">
+        <div class="controls" style="justify-content: space-between;">
+            <h3 style="margin:0;">내 수강신청 강좌</h3>
+            <button id="refreshEnrollmentsBtn" class="btn">새로고침</button>
+        </div>
+        <div id="enrollmentEmptyNotice" class="muted hidden" style="margin-top:0.5rem;">수강 신청 내역이 없습니다.</div>
+        <div class="table-container">
+            <table id="enrollmentTable" class="data-table">
+                <thead>
+                    <tr>
+                        <th>강좌 ID</th>
+                        <th>강좌명</th>
+                        <th>학점</th>
+                        <th>수강 인원</th>
+                        <th>정원</th>
+                        <th>요일</th>
+                        <th>시간</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="enrollmentTableBody"></tbody>
+            </table>
+        </div>
+    </section>
+</div>
+{{end}}
+
+{{define "scripts"}}{{template "client_scripts" .}}{{end}}
+
