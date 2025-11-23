@@ -1,0 +1,138 @@
+{{define "admin_styles"}}
+<style>
+.admin-intro {
+    color: #5f6b7a;
+    margin-bottom: 1.5rem;
+}
+.form-grid {
+    display: grid;
+    gap: 1rem;
+}
+.field-row {
+    display: flex;
+    gap: 1rem;
+}
+.field-row > div {
+    flex: 1;
+}
+.feedback {
+    display: none;
+    margin-bottom: 1rem;
+}
+.admin-container {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+.admin-card {
+    padding: 1.75rem;
+    border-radius: 12px;
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.08);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+    max-width: 540px;
+    margin-bottom: 2rem;
+    flex: 1;
+    min-width: 300px;
+}
+.admin-container .admin-card:first-child {
+    flex: 0 0 540px;
+}
+.admin-container .admin-card:last-child {
+    flex: 1;
+    min-width: 400px;
+    display: flex;
+    flex-direction: column;
+    max-height: 800px;
+}
+#lectureListContainer {
+    overflow-y: auto;
+    flex: 1;
+}
+.lecture-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+.lecture-list-header h3 {
+    margin: 0;
+}
+.lecture-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.lecture-item {
+    padding: 1rem;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+    background: #f8f9fa;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: nowrap;
+}
+.lecture-info {
+    flex: 1;
+    min-width: 0;
+}
+.lecture-info h4 {
+    margin: 0 0 0.5rem 0;
+    color: #2c3e50;
+    font-size: 1.1rem;
+}
+.lecture-details {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.9rem;
+    color: #5f6b7a;
+    flex-wrap: wrap;
+}
+.lecture-details span {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+.btn-delete {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+.btn-delete:hover {
+    background: #c82333;
+}
+.btn-delete:active {
+    background: #bd2130;
+}
+.loading-text, .empty-text {
+    text-align: center;
+    color: #5f6b7a;
+    padding: 2rem;
+}
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+}
+.btn-secondary:hover {
+    background: #5a6268;
+}
+</style>
+{{end}}
+
