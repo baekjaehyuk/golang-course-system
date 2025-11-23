@@ -4,6 +4,7 @@ import (
 	"errors"
 	"golang-course-registration/common/exception"
 	"time"
+	"unicode/utf8"
 )
 
 const (
@@ -27,7 +28,7 @@ func NewLecture(id int, name string, capacity int, credit int, day Day, startTim
 		return nil, errors.New(exception.ErrLectureIDInvalid)
 	}
 
-	if len(name) < 2 || len(name) > 20 {
+	if utf8.RuneCountInString(name) < 2 || utf8.RuneCountInString(name) > 20 {
 		return nil, errors.New(exception.ErrLectureNameRequired)
 	}
 

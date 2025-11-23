@@ -7,7 +7,7 @@ const (
 
 // Lecture 관련 예외 메시지
 const (
-	ErrLectureNameRequired     = "강좌명은 필수입니다"
+	ErrLectureNameRequired     = "강좌명은 2~20자 사이여야 합니다"
 	ErrLectureIDInvalid        = "강좌번호는 1000 ~ 9999 사이의 숫자여야 합니다."
 	ErrLectureCapacityInvalid  = "정원은 1명 이상, 30명 이하여야 합니다"
 	ErrLectureDayRequired      = "강좌 요일은 필수입니다"
