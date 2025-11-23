@@ -1,0 +1,37 @@
+{{define "index_scripts"}}
+<script>
+const portalForm = document.getElementById('clientPortalForm');
+const portalInput = document.getElementById('portalStudentId');
+
+const validateStudentId = (studentId) => {
+    const id = parseInt(studentId, 10);
+    return !isNaN(id) && id >= 1000 && id <= 9999;
+};
+
+if (portalForm) {
+    portalForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const studentId = portalInput.value.trim();
+        if (!studentId) {
+            alert('학번을 입력해주세요.');
+            return;
+        }
+        if (!validateStudentId(studentId)) {
+            alert('학번은 1000~9999 사이의 숫자여야 합니다.');
+            portalInput.focus();
+            return;
+        }
+        window.location.href = `/client/dashboard?studentId=${studentId}`;
+    });
+}
+
+// URL 파라미터에서 에러 메시지 표시
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('error') === 'invalid_student_id') {
+    alert('학번은 1000~9999 사이의 숫자여야 합니다.');
+    // 에러 파라미터 제거
+    window.history.replaceState({}, document.title, window.location.pathname);
+}
+</script>
+{{end}}
+

@@ -1,0 +1,127 @@
+{{define "admin_scripts"}}
+<script>
+const adminFeedback = document.getElementById('adminFeedback');
+const lectureForm = document.getElementById('createLectureForm');
+const lectureListContainer = document.getElementById('lectureListContainer');
+const refreshLecturesBtn = document.getElementById('refreshLecturesBtn');
+
+const setAdminFeedback = (type, message) => {
+    adminFeedback.style.display = 'block';
+    const base = 'alert ';
+    adminFeedback.className = base + (type === 'success' ? 'alert-success' : type === 'info' ? 'alert-info' : 'alert-error');
+    adminFeedback.textContent = message;
+};
+
+// 강좌 목록 조회
+const loadLectures = async () => {
+    lectureListContainer.innerHTML = '<p class="loading-text">로딩 중...</p>';
+    
+    try {
+        const response = await fetch('/api/v1/admin/lectures');
+        const body = await response.json();
+        
+        if (!response.ok || !body.success) {
+            const errorMsg = body.error?.message || body.error || '강좌 목록을 불러오는데 실패했습니다.';
+            throw new Error(errorMsg);
+        }
+        
+        const lectures = body.data || [];
+        
+        if (lectures.length === 0) {
+            lectureListContainer.innerHTML = '<p class="empty-text">등록된 강좌가 없습니다.</p>';
+            return;
+        }
+        
+        const listHTML = `
+            <ul class="lecture-list">
+                ${lectures.map(lecture => `
+                    <li class="lecture-item">
+                        <div class="lecture-info">
+                            <h4>${lecture.name}</h4>
+                            <div class="lecture-details">
+                                <span><strong>번호:</strong> ${lecture.id}</span>
+                                <span><strong>정원:</strong> ${lecture.capacity}명</span>
+                                <span><strong>학점:</strong> ${lecture.credit}학점</span>
+                                <span><strong>요일:</strong> ${lecture.day}</span>
+                                <span><strong>시간:</strong> ${lecture.start_time} ~ ${lecture.end_time}</span>
+                            </div>
+                        </div>
+                        <button class="btn-delete" onclick="deleteLecture(${lecture.id}, '${lecture.name}')">삭제</button>
+                    </li>
+                `).join('')}
+            </ul>
+        `;
+        
+        lectureListContainer.innerHTML = listHTML;
+    } catch (error) {
+        lectureListContainer.innerHTML = `<p class="empty-text" style="color: #dc3545;">${error.message}</p>`;
+    }
+};
+
+// 강좌 삭제
+const deleteLecture = async (id, name) => {
+    if (!confirm(`"${name}" 강좌를 정말 삭제하시겠습니까?`)) {
+        return;
+    }
+    
+    setAdminFeedback('info', '삭제 중입니다...');
+    
+    try {
+        const response = await fetch(`/api/v1/admin/lectures/${id}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+        });
+        
+        const body = await response.json();
+        
+        if (!response.ok || !body.success) {
+            const errorMsg = body.error?.message || body.error || '강좌 삭제에 실패했습니다.';
+            throw new Error(errorMsg);
+        }
+        
+        setAdminFeedback('success', '강좌가 삭제되었습니다.');
+        await loadLectures();
+    } catch (error) {
+        setAdminFeedback('error', error.message);
+    }
+};
+
+// 강좌 등록
+lectureForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    setAdminFeedback('info', '등록 중입니다...');
+
+    const payload = {
+        id : Number(lectureForm.lectureId.value.trim()),
+        name: lectureForm.lectureName.value.trim(),
+        capacity: Number(lectureForm.lectureCapacity.value),
+        credit: Number(lectureForm.lectureCredit.value),
+        day: lectureForm.lectureDay.value,
+        start_time: lectureForm.lectureStart.value,
+        end_time: lectureForm.lectureEnd.value,
+    };
+
+    try {
+        const response = await fetch('/api/v1/admin/lectures', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        });
+        const body = await response.json();
+        if (!response.ok || !body.success) {
+            const errorMsg = body.error?.message || body.error || '강좌 등록에 실패했습니다.';
+            throw new Error(errorMsg);
+        }
+        lectureForm.reset();
+        setAdminFeedback('success', '강좌가 등록되었습니다.');
+        await loadLectures();
+    } catch (error) {
+        setAdminFeedback('error', error.message);
+    }
+});
+
+refreshLecturesBtn.addEventListener('click', loadLectures);
+document.addEventListener('DOMContentLoaded', loadLectures);
+</script>
+{{end}}
+

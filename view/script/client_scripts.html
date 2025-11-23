@@ -1,0 +1,245 @@
+{{define "client_scripts"}}
+<script>
+const dashboard = document.getElementById('clientDashboard');
+const apiBase = '/api/v1/client';
+
+const el = {
+    feedback: document.getElementById('clientFeedback'),
+    currentStudent: document.getElementById('currentStudentId'),
+    lectureTable: document.getElementById('lectureTable'),
+    lectureTableBody: document.getElementById('lectureTableBody'),
+    lectureEmptyNotice: document.getElementById('lectureEmptyNotice'),
+    fetchLecturesBtn: document.getElementById('fetchLecturesBtn'),
+    enrollmentTable: document.getElementById('enrollmentTable'),
+    enrollmentTableBody: document.getElementById('enrollmentTableBody'),
+    enrollmentEmptyNotice: document.getElementById('enrollmentEmptyNotice'),
+    refreshEnrollmentsBtn: document.getElementById('refreshEnrollmentsBtn'),
+};
+
+const state = {
+    studentId: dashboard.dataset.studentId || '',
+    lectures: [],
+};
+
+const setFeedback = (type, message) => {
+    const base = 'alert ';
+    el.feedback.style.display = 'block';
+    el.feedback.className = base + (type === 'success' ? 'alert-success' : type === 'info' ? 'alert-info' : 'alert-error');
+    el.feedback.textContent = message;
+};
+
+const clearFeedback = () => {
+    el.feedback.style.display = 'none';
+    el.feedback.textContent = '';
+};
+
+const validateStudentId = (studentId) => {
+    const id = parseInt(studentId, 10);
+    return !isNaN(id) && id >= 1000 && id <= 9999;
+};
+
+const updateStudentIdFromQuery = () => {
+    const url = new URL(window.location.href);
+    const param = url.searchParams.get('studentId');
+    if (!param) {
+        state.studentId = '';
+        el.currentStudent.textContent = '미지정';
+        return;
+    }
+    
+    // 학번 검증
+    if (!validateStudentId(param.trim())) {
+        setFeedback('error', '학번은 1000~9999 사이의 숫자여야 합니다.');
+        // 메인 페이지로 리다이렉트
+        setTimeout(() => {
+            window.location.href = '/?error=invalid_student_id';
+        }, 2000);
+        return;
+    }
+    
+    state.studentId = param.trim();
+    el.currentStudent.textContent = state.studentId;
+};
+
+const registerStudentSilently = async () => {
+    if (!state.studentId) return;
+    try {
+        await request(`${apiBase}/students`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: Number(state.studentId) }),
+        });
+    } catch (error) {
+        const msg = error.message.toLowerCase();
+        if (msg.includes('duplicate') || msg.includes('이미')) {
+            return;
+        }
+        throw error;
+    }
+};
+
+const request = async (path, options = {}) => {
+    const response = await fetch(path, options);
+    const payload = await response.json();
+    if (!response.ok || !payload.success) {
+        throw new Error(payload.error?.message || '요청 처리에 실패했습니다.');
+    }
+    return payload.data;
+};
+
+const renderLectures = (rows, targetBody, tableEl, emptyNoticeEl) => {
+    targetBody.innerHTML = '';
+    if (!rows || rows.length === 0) {
+        tableEl.style.display = 'none';
+        emptyNoticeEl.classList.remove('hidden');
+        return;
+    }
+    emptyNoticeEl.classList.add('hidden');
+    rows.forEach((lecture) => {
+        const row = document.createElement('tr');
+        row.dataset.lectureId = lecture.id;
+        const currentEnrollment = lecture.current_enrollment !== undefined ? lecture.current_enrollment : 0;
+        const credit = lecture.credit !== undefined ? lecture.credit : 0;
+        row.innerHTML = `
+            <td>${lecture.id}</td>
+            <td>${lecture.name}</td>
+            <td>${credit}학점</td>
+            <td>${currentEnrollment}명</td>
+            <td>${lecture.capacity}명</td>
+            <td>${lecture.day}</td>
+            <td>${lecture.start_time} ~ ${lecture.end_time}</td>
+            <td>
+                <button class="btn-enroll" onclick="enrollLecture(${lecture.id}, '${lecture.name}')">수강신청</button>
+            </td>
+        `;
+        targetBody.appendChild(row);
+    });
+    tableEl.style.display = 'table';
+};
+
+const renderEnrollments = (rows, targetBody, tableEl, emptyNoticeEl) => {
+    targetBody.innerHTML = '';
+    if (!rows || rows.length === 0) {
+        tableEl.style.display = 'none';
+        emptyNoticeEl.classList.remove('hidden');
+        return;
+    }
+    emptyNoticeEl.classList.add('hidden');
+    rows.forEach((lecture) => {
+        const row = document.createElement('tr');
+        row.dataset.lectureId = lecture.id;
+        const currentEnrollment = lecture.current_enrollment !== undefined ? lecture.current_enrollment : 0;
+        const credit = lecture.credit !== undefined ? lecture.credit : 0;
+        row.innerHTML = `
+            <td>${lecture.id}</td>
+            <td>${lecture.name}</td>
+            <td>${credit}학점</td>
+            <td>${currentEnrollment}명</td>
+            <td>${lecture.capacity}명</td>
+            <td>${lecture.day}</td>
+            <td>${lecture.start_time} ~ ${lecture.end_time}</td>
+            <td>
+                <button class="btn-delete" onclick="cancelEnrollment(${lecture.id}, '${lecture.name}')">삭제</button>
+            </td>
+        `;
+        targetBody.appendChild(row);
+    });
+    tableEl.style.display = 'table';
+};
+
+
+const fetchLectures = async () => {
+    clearFeedback();
+    try {
+        const lectures = await request(`${apiBase}/lectures`);
+        state.lectures = lectures;
+        renderLectures(lectures, el.lectureTableBody, el.lectureTable, el.lectureEmptyNotice);
+    } catch (error) {
+        setFeedback('error', error.message);
+    }
+};
+
+el.fetchLecturesBtn.addEventListener('click', fetchLectures);
+
+const enrollLecture = async (lectureID, lectureName) => {
+    if (!state.studentId) {
+        setFeedback('error', '먼저 학번을 적용해주세요.');
+        return;
+    }
+
+    clearFeedback();
+    setFeedback('info', '수강신청 중입니다...');
+
+    try {
+        await request(`${apiBase}/enrollments`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ student_id: Number(state.studentId), lecture_id: lectureID }),
+        });
+        setFeedback('success', `"${lectureName}" 강좌 수강신청이 완료되었습니다.`);
+        await fetchLectures();
+        await loadEnrollments();
+    } catch (error) {
+        setFeedback('error', error.message);
+    }
+};
+
+const loadEnrollments = async () => {
+    if (!state.studentId) {
+        el.enrollmentTable.style.display = 'none';
+        el.enrollmentEmptyNotice.classList.remove('hidden');
+        return;
+    }
+    try {
+        const lectures = await request(`${apiBase}/enrollments/${state.studentId}`);
+        renderEnrollments(lectures, el.enrollmentTableBody, el.enrollmentTable, el.enrollmentEmptyNotice);
+    } catch (error) {
+        setFeedback('error', error.message);
+    }
+};
+
+const cancelEnrollment = async (lectureID, lectureName) => {
+    if (!state.studentId) {
+        setFeedback('error', '학번을 먼저 설정해주세요.');
+        return;
+    }
+
+    if (!confirm(`"${lectureName}" 강좌의 수강신청을 취소하시겠습니까?`)) {
+        return;
+    }
+
+    clearFeedback();
+    setFeedback('info', '취소 중입니다...');
+
+    try {
+        await request(`${apiBase}/enrollments/${state.studentId}/${lectureID}`, {
+            method: 'DELETE',
+        });
+        setFeedback('success', '수강신청이 취소되었습니다.');
+        await fetchLectures();
+        await loadEnrollments(); 
+    } catch (error) {
+        setFeedback('error', error.message);
+    }
+};
+
+el.refreshEnrollmentsBtn.addEventListener('click', async () => {
+    clearFeedback();
+    await loadEnrollments();
+});
+
+updateStudentIdFromQuery();
+
+if (state.studentId) {
+    registerStudentSilently()
+        .then(() => {
+            fetchLectures();
+            loadEnrollments();
+        })
+        .catch((error) => setFeedback('error', error.message));
+} else {
+    fetchLectures();
+}
+</script>
+{{end}}
+
