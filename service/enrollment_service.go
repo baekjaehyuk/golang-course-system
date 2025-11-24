@@ -7,7 +7,6 @@ import (
 	"golang-course-registration/model"
 	"golang-course-registration/repository"
 	"sync"
-	"time"
 )
 
 type EnrollmentService interface {
@@ -101,7 +100,7 @@ func (s *enrollmentService) checkTimeConflict(studentID int, newLecture model.Le
 	}
 
 	for _, existingLecture := range existingLectures {
-		if hasTimeConflict(newLecture, existingLecture) {
+		if existingLecture.HasTimeConflict(&newLecture) {
 			return errors.New(exception.TimeConflictMessage(existingLecture.Name))
 		}
 	}
@@ -140,12 +139,11 @@ func (s *enrollmentService) createEnrollment(studentID, lectureID int) (dto.Enro
 		return dto.EnrollmentResponse{}, err
 	}
 
-	// 강좌 현재 수강 인원 업데이트
 	lecture, err := s.lectureRepo.FindByID(lectureID)
 	if err != nil {
 		return dto.EnrollmentResponse{}, err
 	}
-	lecture.IncrementEnrollment()
+	lecture.IncrementCurrentEnrollment()
 	if err := s.lectureRepo.UpdateCurrentEnrollment(lectureID, lecture.CurrentEnrollment); err != nil {
 		return dto.EnrollmentResponse{}, err
 	}
@@ -173,7 +171,7 @@ func (s *enrollmentService) Cancel(studentID, lectureID int) error {
 	}
 
 	// 강좌 현재 수강 인원 업데이트
-	lecture.DecrementEnrollment()
+	lecture.DecrementCurrentEnrollment()
 	if err := s.lectureRepo.UpdateCurrentEnrollment(lectureID, lecture.CurrentEnrollment); err != nil {
 		return err
 	}
@@ -181,17 +179,7 @@ func (s *enrollmentService) Cancel(studentID, lectureID int) error {
 	return nil
 }
 
-func hasTimeConflict(newLec, existLec model.Lecture) bool {
-	if newLec.Day != existLec.Day {
-		return false
-	}
-	newLecStart, _ := time.Parse("15:04", newLec.StartTime)
-	newLecEnd, _ := time.Parse("15:04", newLec.EndTime)
-	existLecStart, _ := time.Parse("15:04", existLec.StartTime)
-	existLecEnd, _ := time.Parse("15:04", existLec.EndTime)
-	return newLecStart.Before(existLecEnd) && newLecEnd.After(existLecStart)
-}
-
+// getLectureLock 강좌별 동기화 락 생성
 func (s *enrollmentService) getLectureLock(lectureID int) *sync.Mutex {
 	s.locksMutex.Lock()
 	defer s.locksMutex.Unlock()

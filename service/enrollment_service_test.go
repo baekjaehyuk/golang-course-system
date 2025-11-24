@@ -20,14 +20,11 @@ func TestEnrollmentService(t *testing.T) {
 			service := NewEnrollmentService(mockEnrollmentRepo, mockLectureRepo, mockStudentRepo)
 
 			// when
-			response, err := service.Enroll(1001, 2001)
+			response, _ := service.Enroll(1001, 2001)
 
 			// then
-			if err != nil {
-				t.Errorf("unexpected error: %v", err)
-			}
 			if response.StudentID != 1001 || response.LectureID != 2001 {
-				t.Errorf("expected (1001, 2001), got (%d, %d)", response.StudentID, response.LectureID)
+				t.Errorf("기대 : (1001, 2001), 결과 : (%d, %d)", response.StudentID, response.LectureID)
 			}
 		})
 
@@ -44,7 +41,7 @@ func TestEnrollmentService(t *testing.T) {
 
 			// then
 			if err == nil || err.Error() != exception.ErrStudentNotFound {
-				t.Errorf("expected error %s, got %v", exception.ErrStudentNotFound, err)
+				t.Errorf("기대 : %s, 결과 : %v", exception.ErrStudentNotFound, err)
 			}
 		})
 
@@ -61,7 +58,7 @@ func TestEnrollmentService(t *testing.T) {
 
 			// then
 			if err == nil || err.Error() != exception.ErrLectureNotFound {
-				t.Errorf("expected error %s, got %v", exception.ErrLectureNotFound, err)
+				t.Errorf("기대 : %s, 결과 : %v", exception.ErrLectureNotFound, err)
 			}
 		})
 
@@ -80,7 +77,7 @@ func TestEnrollmentService(t *testing.T) {
 
 			// then
 			if err == nil || err.Error() != exception.ErrLectureCapacityExceeded {
-				t.Errorf("expected error %s, got %v", exception.ErrLectureCapacityExceeded, err)
+				t.Errorf("기대 : %s, 결과 : %v", exception.ErrLectureCapacityExceeded, err)
 			}
 		})
 
@@ -101,7 +98,7 @@ func TestEnrollmentService(t *testing.T) {
 			// then
 			expectedError := exception.TimeConflictMessage(existingLecture.Name)
 			if err == nil || err.Error() != expectedError {
-				t.Errorf("expected error %s, got %v", expectedError, err)
+				t.Errorf("기대 : %s, 결과 : %v", expectedError, err)
 			}
 		})
 

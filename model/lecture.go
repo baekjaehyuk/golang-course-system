@@ -12,6 +12,8 @@ const (
 	LectureIDMaxLength = 9999
 )
 
+type Lectures []Lecture
+
 type Lecture struct {
 	ID                int    `json:"id"`
 	Name              string `json:"name"`
@@ -69,14 +71,28 @@ func (l *Lecture) IsFull() bool {
 	return l.CurrentEnrollment >= l.Capacity
 }
 
-// IncrementEnrollment 현재 수강 인원 증가
-func (l *Lecture) IncrementEnrollment() {
+// IncrementCurrentEnrollment 현재 수강 인원 업데이트
+func (l *Lecture) IncrementCurrentEnrollment() {
 	l.CurrentEnrollment++
 }
 
-// DecrementEnrollment 현재 수강 인원 감소
-func (l *Lecture) DecrementEnrollment() {
+// DecrementCurrentEnrollment 현재 수강 인원 업데이트
+func (l *Lecture) DecrementCurrentEnrollment() {
 	if l.CurrentEnrollment > 0 {
 		l.CurrentEnrollment--
 	}
+}
+
+// HasTimeConflict 시간 중복 검증
+func (l *Lecture) HasTimeConflict(other *Lecture) bool {
+	if l.Day != other.Day {
+		return false
+	}
+
+	layout := "15:04"
+	myStart, _ := time.Parse(layout, l.StartTime)
+	myEnd, _ := time.Parse(layout, l.EndTime)
+	otherStart, _ := time.Parse(layout, other.StartTime)
+	otherEnd, _ := time.Parse(layout, other.EndTime)
+	return myStart.Before(otherEnd) && otherStart.Before(myEnd)
 }
