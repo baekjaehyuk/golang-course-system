@@ -5,7 +5,13 @@
 Go 언어와 Echo 프레임워크를 사용하여 구현한 강좌 수강신청 웹 애플리케이션입니다. 관리자는 강좌를 등록하고 관리할 수 있으며, 학생은 강좌를 조회하고 수강신청할 수 있습니다.
 
 빠른 수강신청 프로세스를 위해 인증/인가 프로세스는 간단하게 학번으로만 검증하도록 하였으며, 수강 신청 및 수강 신청 취소 시 동시성 제어를를 위한 메모리 기반 락을 구현하여 단일 서버 환경에서의 경쟁 조건을 방지하고자 하였습니다.
+
+무료 인스턴스를 이용하고 있어 15분 동안 인바운드 트래픽이 없을 경우, 웹 서비스가 중단됩니다. 요청을 받을 경우 서비스를 다시 시작하기에 이 점 참고해 주시면 감사하겠습니다.
+
+* https://course-system-lgdn.onrender.com/
+
 ## 2. 기능 요구사항
+
 
 ### -1. 관리자 기능
 
@@ -197,7 +203,7 @@ go run main.go
 
 #### 1. Docker 이미지 빌드
 ```bash
-docker build -t golang-course-system .
+docker build -t golang-study .
 ```
 
 #### 2. Docker 컨테이너 실행
@@ -208,7 +214,7 @@ docker run -p 8080:8080 \
   -e SUPABASE_URL="your_supabase_url" \
   -e SUPABASE_ANON_KEY="your_supabase_anon_key" \
   -e PORT="8080" \
-  golang-course-system
+  golang-study
 ```
 
 ## 8. 테스트
@@ -241,7 +247,7 @@ go test -v ./...
 - `GET /api/v1/client/enrollments/:studentId`: 수강신청 내역 조회
 - `DELETE /api/v1/client/enrollments/:studentId/:lectureId`: 수강신청 취소
 
-## 9. DB 스키마 
+## 10. DB 스키마 
 
 ```postgresql
 CREATE TABLE enrollments (
