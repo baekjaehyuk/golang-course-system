@@ -53,7 +53,7 @@ func (c *AdminController) DeleteLecture(ctx echo.Context) error {
 	idStr := ctx.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil || id <= 0 {
-		return ctx.JSON(http.StatusBadRequest, errorResponse("유효하지 않은 강좌 번호입니다"))
+		return ctx.JSON(http.StatusBadRequest, errorResponse(exception.ErrLectureIDInvalid))
 	}
 
 	err = c.lectureService.Delete(id)

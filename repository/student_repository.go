@@ -2,6 +2,7 @@ package repository
 
 import (
 	"errors"
+	"golang-course-registration/common/exception"
 	"golang-course-registration/model"
 	"strconv"
 
@@ -42,7 +43,7 @@ func (r *studentRepository) FindByID(id int) (model.Student, error) {
 		return model.Student{}, err
 	}
 	if len(list) == 0 {
-		return model.Student{}, errors.New("student not found")
+		return model.Student{}, errors.New(exception.ErrStudentNotFound)
 	}
 	return list[0], nil
 }

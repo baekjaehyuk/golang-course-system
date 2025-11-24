@@ -2,12 +2,8 @@ package model
 
 import (
 	"errors"
+	"golang-course-registration/common/constants"
 	"golang-course-registration/common/exception"
-)
-
-const (
-	StudentIDMinLength = 1000
-	StudentIDMaxLength = 9999
 )
 
 type Student struct {
@@ -15,7 +11,7 @@ type Student struct {
 }
 
 func NewStudent(id int) (*Student, error) {
-	if id < StudentIDMinLength || id > StudentIDMaxLength {
+	if id < constants.StudentIdMin || id > constants.StudentIdMax {
 		return nil, errors.New(exception.ErrStudentIDInvalid)
 	}
 

@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"golang-course-registration/common/exception"
 	"golang-course-registration/config"
 	"golang-course-registration/controller/api"
 	"golang-course-registration/controller/web"
@@ -73,7 +74,7 @@ func (s *Server) Init() {
 func (s *Server) loadTemplates() (map[string]*template.Template, error) {
 	wd, err := os.Getwd()
 	if err != nil {
-		return nil, fmt.Errorf("작업 디렉토리를 가져올 수 없습니다: %w", err)
+		return nil, fmt.Errorf(exception.ErrNotFoundDirectory)
 	}
 
 	templateDir := filepath.Join(wd, "view", "templates")

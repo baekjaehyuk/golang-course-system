@@ -1,7 +1,7 @@
 package web
 
 import (
-	"golang-course-registration/model"
+	"golang-course-registration/common/constants"
 	"golang-course-registration/service"
 	"net/http"
 	"strconv"
@@ -41,11 +41,9 @@ func (c *PageController) ClientDashboard(ctx echo.Context) error {
 		return ctx.Redirect(http.StatusFound, "/?error=invalid_student_id")
 	}
 
-	if studentID < model.StudentIDMinLength || studentID > model.StudentIDMaxLength {
+	if studentID < constants.StudentIdMin || studentID > constants.StudentIdMax {
 		return ctx.Redirect(http.StatusFound, "/?error=invalid_student_id")
 	}
 
-	return ctx.Render(http.StatusOK, "client.html", map[string]interface{}{
-		"StudentID": studentID,
-	})
+	return ctx.Render(http.StatusOK, "client.html", map[string]interface{}{"StudentID": studentID})
 }

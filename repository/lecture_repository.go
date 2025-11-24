@@ -83,7 +83,7 @@ func (r *lectureRepository) Create(lecture model.Lecture) (model.Lecture, error)
 	}
 
 	if len(result) == 0 {
-		return model.Lecture{}, errors.New("강좌 생성 결과가 비어 있습니다")
+		return model.Lecture{}, errors.New(exception.ErrLectureListIsEmpty)
 	}
 
 	return result[0], nil

@@ -37,11 +37,3 @@ func NewLectureResponse(lecture model.Lecture) LectureResponse {
 		EndTime:           lecture.EndTime,
 	}
 }
-
-func NewLectureListResponse(lectures []model.Lecture) []LectureResponse {
-	result := make([]LectureResponse, 0, len(lectures))
-	for _, lecture := range lectures {
-		result = append(result, NewLectureResponse(lecture))
-	}
-	return result
-}

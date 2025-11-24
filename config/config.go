@@ -1,6 +1,7 @@
 package config
 
 import (
+	"golang-course-registration/common/exception"
 	"log"
 	"os"
 
@@ -15,7 +16,7 @@ type Config struct {
 
 func Load() *Config {
 	if err := godotenv.Load(); err != nil {
-		log.Printf("env 파일을 불러오지 못했습니다: %v", err)
+		log.Printf(exception.ErrEnvFileLoad)
 	}
 
 	return &Config{

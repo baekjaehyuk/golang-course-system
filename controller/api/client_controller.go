@@ -100,7 +100,7 @@ func (c *ClientController) CancelEnrollment(ctx echo.Context) error {
 
 	lectureID, err := strconv.Atoi(lectureIDStr)
 	if err != nil || lectureID <= 0 {
-		return ctx.JSON(http.StatusBadRequest, errorResponse("유효하지 않은 강좌 번호입니다"))
+		return ctx.JSON(http.StatusBadRequest, errorResponse(exception.ErrLectureIDInvalid))
 	}
 
 	err = c.enrollmentService.Cancel(studentID, lectureID)
@@ -108,5 +108,5 @@ func (c *ClientController) CancelEnrollment(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, errorResponse(err.Error()))
 	}
 
-	return ctx.JSON(http.StatusOK, successResponse(map[string]string{"message": "수강신청이 취소되었습니다"}))
+	return ctx.JSON(http.StatusOK, successResponse("수강신청이 취소되었습니다"))
 }

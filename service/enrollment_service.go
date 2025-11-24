@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"golang-course-registration/common/constants"
 	"golang-course-registration/common/exception"
 	"golang-course-registration/controller/dto"
 	"golang-course-registration/model"
@@ -120,7 +121,7 @@ func (s *enrollmentService) checkCreditLimit(studentID int, newLecture model.Lec
 		totalCredit += existingLecture.Credit
 	}
 
-	if totalCredit > 18 {
+	if totalCredit > constants.TotalCreditLimit {
 		return errors.New(exception.ErrCreditLimitExceeded)
 	}
 
@@ -170,7 +171,6 @@ func (s *enrollmentService) Cancel(studentID, lectureID int) error {
 		return err
 	}
 
-	// 강좌 현재 수강 인원 업데이트
 	lecture.DecrementCurrentEnrollment()
 	if err := s.lectureRepo.UpdateCurrentEnrollment(lectureID, lecture.CurrentEnrollment); err != nil {
 		return err

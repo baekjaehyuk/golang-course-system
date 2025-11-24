@@ -1,5 +1,7 @@
 package model
 
+import "golang-course-registration/common/constants"
+
 type Day string
 
 const (
@@ -13,16 +15,16 @@ const (
 func (d Day) ToKorean() string {
 	switch d {
 	case Monday:
-		return "월요일"
+		return constants.MON
 	case Tuesday:
-		return "화요일"
+		return constants.TUE
 	case Wednesday:
-		return "수요일"
+		return constants.WED
 	case Thursday:
-		return "목요일"
+		return constants.THU
 	case Friday:
-		return "금요일"
+		return constants.FRI
 	default:
-		return "undefined"
+		return constants.Undefined
 	}
 }

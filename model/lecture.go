@@ -2,14 +2,9 @@ package model
 
 import (
 	"errors"
+	"golang-course-registration/common/constants"
 	"golang-course-registration/common/exception"
 	"time"
-	"unicode/utf8"
-)
-
-const (
-	LectureIDMinLength = 1000
-	LectureIDMaxLength = 9999
 )
 
 type Lectures []Lecture
@@ -26,33 +21,34 @@ type Lecture struct {
 }
 
 func NewLecture(id int, name string, capacity int, credit int, day Day, startTime, endTime string) (*Lecture, error) {
-	if id < LectureIDMinLength || id > LectureIDMaxLength {
-		return nil, errors.New(exception.ErrLectureIDInvalid)
+	li, err := validateLectureId(id)
+	if err != nil {
+		return li, err
 	}
 
-	if utf8.RuneCountInString(name) < 2 || utf8.RuneCountInString(name) > 20 {
-		return nil, errors.New(exception.ErrLectureNameRequired)
+	ln, err := validateLectureName(name)
+	if err != nil {
+		return ln, err
 	}
 
-	if capacity < 1 || capacity > 30 {
-		return nil, errors.New(exception.ErrLectureCapacityInvalid)
+	lcp, err := validateLectureCapacity(capacity)
+	if err != nil {
+		return lcp, err
 	}
 
-	if credit < 1 || credit > 6 {
-		return nil, errors.New(exception.ErrLectureCreditInvalid)
+	lc, err := validateLectureCredit(credit)
+	if err != nil {
+		return lc, err
 	}
 
-	if day.ToKorean() == "undefined" {
-		return nil, errors.New(exception.ErrLectureDayRequired)
+	ld, err := validateLectureDay(day)
+	if err != nil {
+		return ld, err
 	}
 
-	start, _ := time.Parse("15:04", startTime)
-	end, _ := time.Parse("15:04", endTime)
-	if start.IsZero() || end.IsZero() {
-		return nil, errors.New(exception.ErrLectureTimeRequired)
-	}
-	if !end.After(start) {
-		return nil, errors.New(exception.ErrLectureTimeOrderInvalid)
+	lt, err := validateLectureTime(startTime, endTime)
+	if err != nil {
+		return lt, err
 	}
 
 	return &Lecture{
@@ -95,4 +91,52 @@ func (l *Lecture) HasTimeConflict(other *Lecture) bool {
 	otherStart, _ := time.Parse(layout, other.StartTime)
 	otherEnd, _ := time.Parse(layout, other.EndTime)
 	return myStart.Before(otherEnd) && otherStart.Before(myEnd)
+}
+
+func validateLectureTime(startTime string, endTime string) (*Lecture, error) {
+	start, _ := time.Parse("15:04", startTime)
+	end, _ := time.Parse("15:04", endTime)
+	if start.IsZero() || end.IsZero() {
+		return nil, errors.New(exception.ErrLectureTimeRequired)
+	}
+	if !end.After(start) {
+		return nil, errors.New(exception.ErrLectureTimeOrderInvalid)
+	}
+	return nil, nil
+}
+
+func validateLectureDay(day Day) (*Lecture, error) {
+	if day.ToKorean() == "undefined" {
+		return nil, errors.New(exception.ErrLectureDayRequired)
+	}
+	return nil, nil
+}
+
+func validateLectureCredit(credit int) (*Lecture, error) {
+	if credit < constants.LectureCreditMin || credit > constants.LectureCreditMax {
+		return nil, errors.New(exception.ErrLectureCreditInvalid)
+	}
+	return nil, nil
+}
+
+func validateLectureCapacity(capacity int) (*Lecture, error) {
+	if capacity < constants.LectureCapacityMin || capacity > constants.LectureCapacityMax {
+		return nil, errors.New(exception.ErrLectureCapacityInvalid)
+	}
+	return nil, nil
+}
+
+func validateLectureId(id int) (*Lecture, error) {
+	if id < constants.LectureIdMin || id > constants.LectureIdMax {
+		return nil, errors.New(exception.ErrLectureIDInvalid)
+	}
+	return nil, nil
+}
+
+func validateLectureName(name string) (*Lecture, error) {
+	nameLen := len([]rune(name))
+	if nameLen < constants.LectureNameMin || nameLen > constants.LectureNameMax {
+		return nil, errors.New(exception.ErrLectureNameRequired)
+	}
+	return nil, nil
 }

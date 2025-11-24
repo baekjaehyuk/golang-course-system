@@ -2,6 +2,7 @@ package model
 
 import (
 	"errors"
+	"golang-course-registration/common/constants"
 	"golang-course-registration/common/exception"
 )
 
@@ -12,7 +13,7 @@ type Enrollment struct {
 }
 
 func NewEnrollment(studentID, lectureID int) (*Enrollment, error) {
-	if studentID < StudentIDMinLength || studentID > StudentIDMaxLength {
+	if studentID < constants.StudentIdMin || studentID > constants.StudentIdMax {
 		return nil, errors.New(exception.ErrStudentIDInvalid)
 	}
 
